@@ -1,7 +1,6 @@
 pipeline {
     agent any
 
-    // Используем Node.js, который мы настроили ранее
     tools {
         nodejs 'NodeJS'
     }
@@ -18,6 +17,11 @@ pipeline {
             steps {
                 echo 'Собираем Vite проект...'
                 sh 'npm run build'
+
+                // ДОБАВЛЕНО: Проверяем, что создалось в папке
+                echo '=== Проверяем содержимое папки dist ==='
+                sh 'ls -la'
+                sh 'ls -la dist || echo "Папка dist не найдена или пуста!"'
             }
         }
     }
@@ -25,11 +29,10 @@ pipeline {
     post {
         success {
             echo '✅ Сборка прошла успешно!'
-            // Сохраняем папку dist как артефакт сборки
             archiveArtifacts artifacts: 'dist/**', allowEmptyArchive: true
         }
         failure {
-            echo '❌ Ошибка сборки. Проверь код или зависимости.'
+            echo '❌ Ошибка сборки.'
         }
     }
 }
